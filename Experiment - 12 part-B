@@ -1,0 +1,65 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <unordered_set>
+
+using namespace std;
+
+// Function to display the current frames
+void displayFrames(const queue<int>& frames) {
+    queue<int> temp = frames;
+    while (!temp.empty()) {
+        cout << temp.front() << " ";
+        temp.pop();
+    }
+    cout << endl;
+}
+
+// Function implementing the FIFO Page Replacement
+void fifoPageReplacement(const vector<int>& pages, int capacity) {
+    cout << "\nFIFO Page Replacement\n";
+    queue<int> frames; // Stores current pages in memory
+    unordered_set<int> frameSet; // Helps check if a page is in memory
+    int pageFaults = 0; // Count of page faults
+
+    for (int page : pages) {
+        if (frameSet.find(page) == frameSet.end()) {
+            // Page fault occurs
+            pageFaults++;
+            if (frames.size() == capacity) {
+                // Remove the oldest page (FIFO)
+                int oldestPage = frames.front();
+                frames.pop();
+                frameSet.erase(oldestPage);
+            }
+            // Add the new page
+            frames.push(page);
+            frameSet.insert(page);
+        }
+
+        // Display the current state of frames
+        displayFrames(frames);
+    }
+
+    cout << "Total Page Faults: " << pageFaults << endl;
+}
+
+int main() {
+    int capacity;
+    cout << "Enter the number of frames: ";
+    cin >> capacity;
+
+    int n;
+    cout << "Enter the number of pages: ";
+    cin >> n;
+
+    vector<int> pages(n);
+    cout << "Enter the page reference string: ";
+    for (int i = 0; i < n; i++) {
+        cin >> pages[i];
+    }
+
+    fifoPageReplacement(pages, capacity);
+
+    return 0;
+}

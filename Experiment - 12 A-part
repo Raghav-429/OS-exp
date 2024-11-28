@@ -1,0 +1,75 @@
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
+
+using namespace std;
+
+// Function to display the current frames
+void displayFrames(const vector<int>& frames) {
+    for (int page : frames) {
+        cout << page << " ";
+    }
+    cout << endl;
+}
+
+// Function implementing the LRU Page Replacement
+void lruPageReplacement(const vector<int>& pages, int capacity) {
+    cout << "\nLRU Page Replacement\n";
+    vector<int> frames; // Stores current pages in memory
+    unordered_map<int, int> pageMap; // Maps page to its last accessed index
+    int pageFaults = 0; // Count of page faults
+
+    for (int i = 0; i < pages.size(); i++) {
+        int page = pages[i];
+        
+        // Check if the page is already in frames
+        auto it = find(frames.begin(), frames.end(), page);
+        if (it == frames.end()) {
+            // Page fault occurs
+            pageFaults++;
+            if (frames.size() == capacity) {
+                // Find the least recently used page
+                int lruIndex = i; // Initialize to current index
+                int lruPage;      // Page to replace
+                for (int frame : frames) {
+                    if (pageMap[frame] < lruIndex) {
+                        lruIndex = pageMap[frame];
+                        lruPage = frame;
+                    }
+                }
+                // Remove the LRU page
+                frames.erase(remove(frames.begin(), frames.end(), lruPage), frames.end());
+            }
+            // Add the new page
+            frames.push_back(page);
+        }
+        // Update the last accessed index for the page
+        pageMap[page] = i;
+
+        // Display the current state of frames
+        displayFrames(frames);
+    }
+
+    cout << "Total Page Faults: " << pageFaults << endl;
+}
+
+int main() {
+    int capacity;
+    cout << "Enter the number of frames: ";
+    cin >> capacity;
+
+    int n;
+    cout << "Enter the number of pages: ";
+    cin >> n;
+
+    vector<int> pages(n);
+    cout << "Enter the page reference string: ";
+    for (int i = 0; i < n; i++) {
+        cin >> pages[i];
+    }
+
+    lruPageReplacement(pages, capacity);
+
+    return 0;
+}
